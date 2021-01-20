@@ -10,10 +10,10 @@ export const Container = styled.div<ContainerProps>`
   border-radius: 10px;
   border: 2px solid #fff;
   padding: 15px 10px;
-  margin: 15px;
+  margin: 15px 0 15px 15px;
   display: flex;
   align-items: center;
-  width: 280px;
+  width: 50px;
 
 
   ${props =>

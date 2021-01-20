@@ -6,6 +6,12 @@ export const Container = styled.div`
   max-width: 1120px;
   margin: 0 auto;
   padding: 40px 20px;
+
+  .createContainer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 `;
 
 export const Title = styled.div`

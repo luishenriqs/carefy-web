@@ -1,10 +1,11 @@
-import React, { useState, FormEvent, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import api from '../../services/api';
 import { Form } from '@unform/web';
 import Header from '../../components/Header';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import PatientFooter from '../../components/PatientFooter';
+import Logo from '../../assets/carefyLogo5.png';
+import Footer from '../../components/Footer';
 
 import { Container, TableContainer, Title, Content } from './styles';
 
@@ -16,21 +17,26 @@ interface Physician {
   updated_at: Date;
 }
 
+interface IName {
+    name: string;
+}
+
+interface ISpecialty {
+    medicalSpecialty: string;
+}
+
+interface ICreate {
+    name: string;
+    medicalSpecialty: string;
+  }
+
 const PhysicianPage: React.FC = () => {
     const formRef = useRef(null);
 
 
     const [physicianArray, setPhysicianArray] = useState<Physician[]>([]);
-
     const [foundedPhysician, setFoundedPhysician] = useState<Physician[]>([]);
 
-
-    const [name, setName] = useState('');
-    const [medicalSpecialty, setMedicalSpecialty] = useState('');
-
- 
-
-  console.log('linha24:', name);
 
 /* **[USE EFFECT - CARREGA OS DADOS DE FORMA AUTOMÁTICA JUNTO COM A PÁGINA]** */
 //   useEffect(() => {
@@ -44,7 +50,7 @@ const PhysicianPage: React.FC = () => {
 /* ************************************************************************** */
 
 /* ************************[INDEX PHYSICIAN]********************************* */
-  async function handleIndex(): Promise<void> {
+async function handleIndex(): Promise<void> {
     const response = await api.get(`/physicians/index`);
     const physicians = response.data;
     setPhysicianArray(physicians);
@@ -52,49 +58,62 @@ const PhysicianPage: React.FC = () => {
 /* ************************************************************************** */
 
 /* **********************[SHOW PHYSICIAN BY NAME]**************************** */
-function handleShowPhysicianByName(data: object): void {
+async function handleShowPhysicianByName({name}: IName): Promise<Physician[]> {
 
-    console.log(data)
-
-    // const response = await api.get(`/physicians/show`, {
-    //     name,
-    // });
-    // const physician = response.data;
-    // console.log(physician)
-    // setFoundedPhysician(physician);
-    // setName('');
+      const response = await api.get(`/physicians/showbyname`, {
+        params: {
+            name,
+        }
+    });
+    const physician = response.data;
+    setFoundedPhysician(physician);
+    return physician;
   }
 /* ************************************************************************** */
 
 /* *******************[SHOW PHYSICIAN BY SPECIALTY]************************** */
-// ????????????????????????????
+async function handleShowPhysicianBySpecialty({
+    medicalSpecialty
+}: ISpecialty): Promise<Physician[]> {
 
-async function handleShowPhysicianByMedicalSpecialty(
-    event: FormEvent<HTMLFormElement>,
-  ): Promise<void> {
-    // event.preventDefault();
-    // const response = await api.get('/physicians/show?????', {
-    //     medicalSpecialty,
-    // });
-    // const physician = response.data;
-    // setFoundedPhysician(physician);
-    // setMedicalSpecialty('');
+    const response = await api.get(`/physicians/showbyspecialty`, {
+      params: {
+          medicalSpecialty,
+      }
+  });
+  const physician = response.data;
+  setFoundedPhysician(physician);
+  return physician;
+}
+/* ************************************************************************** */
+
+/* *************************[CREATE PHYSICIAN]******************************* */
+async function handleAddPhysician(data: ICreate): Promise<Physician> {
+    
+    console.log('Array: ', data)
+    
+    const response = await api.post('/physicians', {
+        name: data.name,
+        medicalSpecialty: data.medicalSpecialty,   
+    });
+
+    const newPhysician = response.data;
+    return newPhysician;
   }
 /* ************************************************************************** */
 
 
-
-  async function handleList(id: string): Promise<void> {
+  async function handleListAppointments(id: string | undefined): Promise<void> {
     const response = await api.get(`/physicians/${id}`);
     console.log(response);
   }
 
-  async function handleEdit(id: string): Promise<void> {
+  async function handleEdit(id: string | undefined): Promise<void> {
     const response = await api.patch(`/physicians/${id}`);
     console.log(response);
   }
 
-  async function handleDelete(id: string): Promise<void> {
+  async function handleDelete(id: string | undefined): Promise<void> {
     const response = await api.delete(`/physicians/${id}`);
     console.log(response);
   }
@@ -114,19 +133,19 @@ async function handleShowPhysicianByMedicalSpecialty(
                         </div>
                         <Button
                             className="listButton"
-                            type="button"
+                            type="submit"
                         >
                             Buscar
                         </Button>
                     </Form>
-                    <Form ref={formRef} onSubmit={handleShowPhysicianByName}>
+                    <Form ref={formRef} onSubmit={handleShowPhysicianBySpecialty}>
                         <div className="inputContainer">
                             <legend>Procure por especialidade</legend>
                             <Input name="medicalSpecialty" placeholder="Especialidade" />
                         </div>
                         <Button
                             className="listButton"
-                            type="button"
+                            type="submit"
                         >
                             Buscar
                         </Button>
@@ -140,9 +159,8 @@ async function handleShowPhysicianByMedicalSpecialty(
                                 <th>Especialidade Médica</th>
                             </tr>
                         </thead>
-
                         {foundedPhysician.map(physician => (
-                        <tbody
+                            <tbody
                             key={physician.id}>
                             <tr>
                                 <td>{physician.name}</td>
@@ -151,7 +169,7 @@ async function handleShowPhysicianByMedicalSpecialty(
                             <Button
                                 className="appointmentButton"
                                 type="button"
-                                onClick={() => handleList(physician.id)}
+                                onClick={() => handleListAppointments(physician.id)}
                             >
                                 Agenda
                             </Button>
@@ -205,7 +223,7 @@ async function handleShowPhysicianByMedicalSpecialty(
                             <Button
                                 className="appointmentButton"
                                 type="button"
-                                onClick={() => handleList(physician.id)}
+                                onClick={() => handleListAppointments(physician.id)}
                             >
                                 Agenda
                             </Button>
@@ -228,7 +246,25 @@ async function handleShowPhysicianByMedicalSpecialty(
                     </table>
                 </TableContainer>
             </Container>
-            <PatientFooter />
+            
+            <Container>
+                <Form ref={formRef} onSubmit={handleAddPhysician}>
+                    <Title><h1>Cadastre um novo médico:</h1></Title>
+                    <div className="createContainer">
+                    <Input name="name" placeholder="Nome"/>
+                    <Input name="medicalSpecialty" placeholder="Especialidade Médica" />
+                    <Button
+                        className="addButton"
+                        type="submit"
+                    >
+                        Enviar
+                    </Button>
+                    </div>
+                    <img src={Logo} alt="Carefy Logo" />
+                </Form>
+            </Container>
+
+            <Footer />
         </>
     );
 };

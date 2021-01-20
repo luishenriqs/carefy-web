@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import Header from '../../components/Header';
-import PatientFooter from '../../components/PatientFooter';
+import Footer from '../../components/Footer';
 
 import { Container, TableContainer } from './styles';
 
@@ -91,7 +91,7 @@ const PatientPage: React.FC = () => {
           </table>
         </TableContainer>
       </Container>
-      <PatientFooter />
+      <Footer />
     </>
   );
 };
