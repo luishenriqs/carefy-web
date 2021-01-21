@@ -15,19 +15,20 @@ export const Container = styled.div`
 `;
 
 export const Title = styled.div`
-  width: 100%;
-  display: flex;
-  text-align: center;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    background: #40e0d0;
+    border-radius: 50px;
+    width: 500px;
+    margin: 20px auto;
 
     h1 {
         width: 100%;
-        color: #969cb3;
+        color: #f5f5f5;
         font-size: 36px;
         font-weight: normal;
-        padding: 20px 32px;
-
     }
 `;
 
@@ -59,19 +60,6 @@ export const Content = styled.div`
 
 export const TableContainer = styled.section`
     margin: 20px 5px 0 5px;
-
-    #title {
-        display: flex;
-        text-align: center;
-        justify-content: center;
-
-        h1 {
-        color: #969cb3;
-        font-size: 48px;
-        font-weight: normal;
-        padding: 20px 32px;
-        }
-    }
 
     thead {
         width: 800px;

@@ -7,13 +7,13 @@ interface ContainerProps {
 
 export const Container = styled.div<ContainerProps>`
   background: #fff;
-  border-radius: 10px;
+  border-radius: 50px;
   border: 2px solid #fff;
   padding: 15px 10px;
-  margin: 15px 0 15px 15px;
+  margin: 15px;
   display: flex;
   align-items: center;
-  width: 50px;
+  width: 70px;
 
 
   ${props =>

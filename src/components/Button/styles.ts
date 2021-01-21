@@ -4,10 +4,10 @@ import { shade } from 'polished';
 export const Container = styled.button`
     color: #fff;
     width: 80px;
-    height: 62px;
+    height: 52px;
     padding: 0px 10px;
     margin-left: 5px;
-    border-radius: 10px;
+    border-radius: 50px;
     border: none;
     font-weight: normal;
     transition: 0.5s;
@@ -21,39 +21,37 @@ export const Container = styled.button`
     }
   }
 
-  &.appointmentButton {
+  &.blueButton {
     background: #1c86ee;
-    height: 58px;
 
     &:hover {
       background: ${shade(0.2, '#1c86ee')};
     }
   }
 
-  &.updateButton {
+  &.greenButton {
     background: #40e0d0;
-    height: 58px;
 
     &:hover {
       background: ${shade(0.2, '#40e0d0')};
     }
   }
 
-  &.deleteButton {
+  &.redButton {
     background: #ff6a6a;
-    height: 58px;
 
     &:hover {
       background: ${shade(0.2, '#ff6a6a')};
     }
   }
 
-  &.addButton {
-    background:  #40e0d0;
-    height: 52px;
+  &.especialButton {
+    background:  #ff6a6a;
+    border-radius: 0 50px 50px 0;
+    width: 90px;
 
     &:hover {
-      background: ${shade(0.2, '#40e0d0')};
+      background: ${shade(0.2, '#ff6a6a')};
     }
   }
 
@@ -86,6 +84,5 @@ export const Container = styled.button`
       background: ${shade(0.2, '#ff6a6a')};
     }
   }
-
 
 `;

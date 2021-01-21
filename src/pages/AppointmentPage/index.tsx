@@ -3,26 +3,31 @@ import api from '../../services/api';
 import { Form } from '@unform/web';
 import Header from '../../components/Header';
 import Input from '../../components/Input';
+import SmallInput from '../../components/SmallInput';
 import Button from '../../components/Button';
 import Logo from '../../assets/carefyLogo5.png';
 import Footer from '../../components/Footer';
 
 import { Container, TableContainer, Title, Content } from './styles';
 
-interface Physician {
+interface Appointment {
   id: string;
-  name: string;
-  medicalSpecialty: string;
+  physician: string;
+  patient: string;
+  month: string;
+  day: string;
+  start: string;
+  end: string;
   created_at: Date;
   updated_at: Date;
 }
 
-interface IName {
-    name: string;
+interface IPhysician {
+    physician: string;
 }
 
-interface ISpecialty {
-    medicalSpecialty: string;
+interface IPatient {
+    patient: string;
 }
 
 interface ICreate {
@@ -30,24 +35,14 @@ interface ICreate {
     medicalSpecialty: string;
   }
 
-const PhysicianPage: React.FC = () => {
+const AppointmentPage: React.FC = () => {
     const formRef = useRef(null);
 
 
-    const [physicianArray, setPhysicianArray] = useState<Physician[]>([]);
-    const [foundedPhysician, setFoundedPhysician] = useState<Physician[]>([]);
+    const [foundedAppointments, setFoundedAppointments] = useState<Appointment[]>([]);
+    
+    const [physicianArray, setPhysicianArray] = useState<Appointment[]>([]);
 
-
-/* **[USE EFFECT - CARREGA OS DADOS DE FORMA AUTOMÁTICA JUNTO COM A PÁGINA]** */
-//   useEffect(() => {
-//     async function loadPhysician(): Promise<void> {
-//       const response = await api.get('/physicians/index');
-//       const physicians = response.data;
-//       setPhysicianArray(physicians);
-//     }
-//     loadPhysician();
-//   }, [physicianArray]);
-/* ************************************************************************** */
 
 /* ************************[INDEX PHYSICIAN]********************************* */
 async function handleIndex(): Promise<void> {
@@ -57,38 +52,43 @@ async function handleIndex(): Promise<void> {
   }
 /* ************************************************************************** */
 
-/* **********************[SHOW PHYSICIAN BY NAME]**************************** */
-async function handleShowPhysicianByName({name}: IName): Promise<Physician[]> {
+/* *******************[SHOW APPOINTMENT BY PHYSICIAN]************************ */
+async function handleShowAppointmentByPhysician({
+    physician
+}: IPhysician): Promise<Appointment[]> {
 
-      const response = await api.get(`/physicians/showbyname`, {
+      const response = await api.get(`/appointments/showbyphysician`, {
         params: {
-            name,
+            physician,
         }
     });
-    const physician = response.data;
-    setFoundedPhysician(physician);
-    return physician;
+    const appointments = response.data;
+
+    console.log('log do handle: ', appointments)
+
+    setFoundedAppointments(appointments);
+    return appointments;
   }
 /* ************************************************************************** */
 
 /* *******************[SHOW PHYSICIAN BY SPECIALTY]************************** */
-async function handleShowPhysicianBySpecialty({
-    medicalSpecialty
-}: ISpecialty): Promise<Physician[]> {
+async function handleShowAppointmentByPatient({
+    patient
+}: IPatient): Promise<Appointment[]> {
 
     const response = await api.get(`/physicians/showbyspecialty`, {
       params: {
-          medicalSpecialty,
+        patient,
       }
   });
-  const physician = response.data;
-  setFoundedPhysician(physician);
-  return physician;
+  const appointments = response.data;
+  setFoundedAppointments(appointments);
+  return appointments;
 }
 /* ************************************************************************** */
 
 /* *************************[CREATE PHYSICIAN]******************************* */
-async function handleAddPhysician(data: ICreate): Promise<Physician> {
+async function handleAddPhysician(data: ICreate): Promise<Appointment> {
     
     console.log('Array: ', data)
     
@@ -122,14 +122,14 @@ async function handleAddPhysician(data: ICreate): Promise<Physician> {
         <>
             <Header size='small'/>
             <Title>
-                <h1>Encontre o seu médico:</h1>
+                <h1>Encontre uma consulta:</h1>
             </Title>
             <Container>
                 <Content>
-                    <Form ref={formRef} onSubmit={handleShowPhysicianByName}>
+                    <Form ref={formRef} onSubmit={handleShowAppointmentByPhysician}>
                         <div className="inputContainer">
-                            <legend>Procure por nome</legend>
-                            <Input name="name" placeholder="Nome" />
+                            <legend>Procure por médico</legend>
+                            <Input name="physician" placeholder="Médico" />
                         </div>
                         <Button
                             className="listButton"
@@ -138,10 +138,10 @@ async function handleAddPhysician(data: ICreate): Promise<Physician> {
                             Buscar
                         </Button>
                     </Form>
-                    <Form ref={formRef} onSubmit={handleShowPhysicianBySpecialty}>
+                    <Form ref={formRef} onSubmit={handleShowAppointmentByPatient}>
                         <div className="inputContainer">
-                            <legend>Procure por especialidade</legend>
-                            <Input name="medicalSpecialty" placeholder="Especialidade" />
+                            <legend>Procure por paciente</legend>
+                            <Input name="patient" placeholder="Paciente" />
                         </div>
                         <Button
                             className="listButton"
@@ -155,35 +155,43 @@ async function handleAddPhysician(data: ICreate): Promise<Physician> {
                     <table>
                         <thead>
                             <tr>
-                                <th>Nome</th>
-                                <th>Especialidade Médica</th>
+                                <th>Médico</th>
+                                <th>Paciente</th>
+                                <th>Mês</th>
+                                <th>Dia</th>
+                                <th>Início</th>
+                                <th>Fim</th>
                             </tr>
                         </thead>
-                        {foundedPhysician.map(physician => (
+                        {foundedAppointments.map(appointment => (
                             <tbody
-                            key={physician.id}>
+                            key={appointment.id}>
                             <tr>
-                                <td>{physician.name}</td>
-                                <td>{physician.medicalSpecialty}</td>
+                                <td>{appointment.physician}</td>
+                                <td>{appointment.patient}</td>
+                                <td>{appointment.month}</td>
+                                <td>{appointment.day}</td>
+                                <td>{appointment.start}</td>
+                                <td>{appointment.end}</td>
                             </tr>
                             <Button
                                 className="blueButton"
                                 type="button"
-                                onClick={() => handleListAppointments(physician.id)}
+                                onClick={() => handleListAppointments(appointment.id)}
                             >
                                 Agenda
                             </Button>
                             <Button
                                 className="greenButton"
                                 type="button"
-                                onClick={() => handleEdit(physician.id)}
+                                onClick={() => handleEdit(appointment.id)}
                             >
                                 Editar
                             </Button>
                             <Button
                                 className="redButton"
                                 type="button"
-                                onClick={() => handleDelete(physician.id)}
+                                onClick={() => handleDelete(appointment.id)}
                             >
                                 Deletar
                             </Button>
@@ -197,49 +205,57 @@ async function handleAddPhysician(data: ICreate): Promise<Physician> {
                 <TableContainer>
                     <div id="title">
                         <Title>
-                            <h1>Lista de Médicos</h1>
+                            <h1>Lista de Consultas</h1>
                             <Button
                                 className="especialButton"
                                 type="button"
                                 onClick={() => handleIndex()}
                             >
-                                Listar Médicos
+                                Listar Consultas
                             </Button>
                         </Title>
                     </div>
                     <table>
                         <thead>
                             <tr>
-                                <th>Nome</th>
-                                <th>Especialidade Médica</th>
+                                <th>Médico</th>
+                                <th>Paciente</th>
+                                <th>Mês</th>
+                                <th>Dia</th>
+                                <th>Início</th>
+                                <th>Fim</th>
                             </tr>
                         </thead>
 
-                        {physicianArray.map(physician => (
+                        {physicianArray.map(appointments => (
                         <tbody
-                            key={physician.id}>
+                            key={appointments.id}>
                             <tr>
-                                <td>{physician.name}</td>
-                                <td>{physician.medicalSpecialty}</td>
+                                <td>{appointments.physician}</td>
+                                <td>{appointments.patient}</td>
+                                <td>{appointments.month}</td>
+                                <td>{appointments.day}</td>
+                                <td>{appointments.start}</td>
+                                <td>{appointments.end}</td>
                             </tr>
                             <Button
                                 className="blueButton"
                                 type="button"
-                                onClick={() => handleListAppointments(physician.id)}
+                                onClick={() => handleListAppointments(appointments.id)}
                             >
                                 Agenda
                             </Button>
                             <Button
                                 className="greenButton"
                                 type="button"
-                                onClick={() => handleEdit(physician.id)}
+                                onClick={() => handleEdit(appointments.id)}
                             >
                                 Editar
                             </Button>
                             <Button
                                 className="redButton"
                                 type="button"
-                                onClick={() => handleDelete(physician.id)}
+                                onClick={() => handleDelete(appointments.id)}
                             >
                                 Deletar
                             </Button>
@@ -251,10 +267,14 @@ async function handleAddPhysician(data: ICreate): Promise<Physician> {
             
             <Container>
                 <Form ref={formRef} onSubmit={handleAddPhysician}>
-                    <Title><h1>Cadastre um novo médico:</h1></Title>
+                    <Title><h1>Cadastre uma nova consulta:</h1></Title>
                     <div className="createContainer">
-                    <Input name="name" placeholder="Nome"/>
-                    <Input name="medicalSpecialty" placeholder="Especialidade Médica" />
+                    <Input name="physician" placeholder="Médico"/>
+                    <Input name="patient" placeholder="Paciente" />
+                    <SmallInput name="month" placeholder="Mês" />
+                    <SmallInput name="day" placeholder="Dia" />
+                    <SmallInput name="start" placeholder="Início" />
+                    <SmallInput name="end" placeholder="Fim" />
                     <Button
                         className="greenButton"
                         type="submit"
@@ -271,4 +291,4 @@ async function handleAddPhysician(data: ICreate): Promise<Physician> {
     );
 };
 
-export default PhysicianPage;
+export default AppointmentPage;

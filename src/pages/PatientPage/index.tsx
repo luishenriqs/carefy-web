@@ -1,99 +1,254 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import api from '../../services/api';
+import { Form } from '@unform/web';
 import Header from '../../components/Header';
+import Input from '../../components/Input';
+import SmallInput from '../../components/SmallInput';
+import Button from '../../components/Button';
+import Logo from '../../assets/carefyLogo5.png';
 import Footer from '../../components/Footer';
 
-import { Container, TableContainer } from './styles';
+import { Container, TableContainer, Title, Content } from './styles';
 
 interface Patient {
   id: string;
   name: string;
+  codeArea1: string;
   preferredPhone: string;
+  codeArea2: string;
   secondaryPhone: string;
   created_at: Date;
   updated_at: Date;
 }
 
+interface IName {
+    name: string;
+}
+
+interface ICreate {
+    name: string;
+    codeArea1: string;
+    preferredPhone: string;
+    codeArea2: string;
+    secondaryPhone: string;
+  }
+
 const PatientPage: React.FC = () => {
-  const [patientsArray, setPatientsArray] = useState<Patient[]>([]);
+    const formRef = useRef(null);
 
-  useEffect(() => {
-    async function loadPatient(): Promise<void> {
-      const response = await api.get('/patients/index');
-      const patients = response.data;
-      setPatientsArray(patients);
-    }
 
-    loadPatient();
-  }, [patientsArray]);
+    const [patientsArray, setPatientsArray] = useState<Patient[]>([]);
 
-  async function handleList(id: string): Promise<void> {
-    const response = await api.get(`/patients/${id}`);
+    const [foundedPatients, setFoundedPatients] = useState<Patient[]>([]);
+
+/* *************************[INDEX PATIENTS]********************************* */
+async function handleIndex(): Promise<void> {
+    const response = await api.get(`/patients/index`);
+    const patients = response.data;
+    setPatientsArray(patients);
+  }
+/* ************************************************************************** */
+
+/* ***********************[SHOW PATIENT BY NAME]***************************** */
+async function handleShowPatientByName({name}: IName): Promise<Patient[]> {
+
+      const response = await api.get(`/patients/showbyname`, {
+        params: {
+            name,
+        }
+    });
+    const patients = response.data;
+    setFoundedPatients(patients);
+    return patients;
+  }
+/* ************************************************************************** */
+
+/* **************************[CREATE PATIENT]******************************** */
+async function handleAddPatient(data: ICreate): Promise<Patient> {
+    
+    const response = await api.post('/patients', {
+        name: data.name,
+        codeArea1: data.codeArea1,
+        preferredPhone: data.preferredPhone,
+        codeArea2: data.codeArea2,
+        secondaryPhone: data.secondaryPhone,
+    });
+
+    const newPatient = response.data;
+    return newPatient;
+  }
+/* ************************************************************************** */
+
+
+  async function handleListPatients(id: string | undefined): Promise<void> {
+    const response = await api.get(`/physicians/${id}`);
     console.log(response);
   }
 
-  async function handleEdit(id: string): Promise<void> {
-    const response = await api.patch(`/patients/${id}`);
+  async function handleEdit(id: string | undefined): Promise<void> {
+    const response = await api.patch(`/physicians/${id}`);
     console.log(response);
   }
 
-  async function handleDelete(id: string): Promise<void> {
-    const response = await api.delete(`/patients/${id}`);
+  async function handleDelete(id: string | undefined): Promise<void> {
+    const response = await api.delete(`/physicians/${id}`);
     console.log(response);
   }
 
-  return (
-    <>
-      <Header size='small'/>
-      <Container>
-        <TableContainer>
-          <div className="title">
-            <h1>Lista de Pacientes</h1>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Telefone Preferencial</th>
-                <th>Telefone Secundário</th>
-              </tr>
-            </thead>
-            {patientsArray.map(patient => (
-              <tbody key={patient.id}>
-                <tr>
-                  <td>{patient.name}</td>
-                  <td>{patient.preferredPhone}</td>
-                  <td>{patient.secondaryPhone}</td>
-                  <button
-                    className="listButton"
-                    type="button"
-                    onClick={() => handleList(patient.id)}
-                  >
-                    Agenda
-                  </button>
-                  <button
-                    className="editButton"
-                    type="button"
-                    onClick={() => handleEdit(patient.id)}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    className="deleteButton"
-                    type="button"
-                    onClick={() => handleDelete(patient.id)}
-                  >
-                    Deletar
-                  </button>
-                </tr>
-              </tbody>
-            ))}
-          </table>
-        </TableContainer>
-      </Container>
-      <Footer />
-    </>
-  );
+    return (
+        <>
+            <Header size='small'/>
+            <Title>
+                <h1>Encontre um paciente:</h1>
+            </Title>
+            <Container>
+                <Content>
+                    <Form ref={formRef} onSubmit={handleShowPatientByName}>
+                        <div className="inputContainer">
+                            <legend>Procure por nome</legend>
+                            <Input name="name" placeholder="Nome" />
+                        </div>
+                        <Button
+                            className="listButton"
+                            type="submit"
+                        >
+                            Buscar
+                        </Button>
+                    </Form>
+                </Content>
+                <TableContainer>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>DDD</th>
+                                <th>Telefone Preferencial</th>
+                                <th>DDD</th>
+                                <th>Telefone secundário</th>
+                            </tr>
+                        </thead>
+                        {foundedPatients.map(patient => (
+                            <tbody
+                            key={patient.id}>
+                            <tr>
+                                <td>{patient.name}</td>
+                                <td>{patient.codeArea1}</td>
+                                <td>{patient.preferredPhone}</td>
+                                <td>{patient.codeArea2}</td>
+                                <td>{patient.secondaryPhone}</td>
+                            </tr>
+                            <Button
+                                className="blueButton"
+                                type="button"
+                                onClick={() => handleListPatients(patient.id)}
+                            >
+                                Agenda
+                            </Button>
+                            <Button
+                                className="greenButton"
+                                type="button"
+                                onClick={() => handleEdit(patient.id)}
+                            >
+                                Editar
+                            </Button>
+                            <Button
+                                className="redButton"
+                                type="button"
+                                onClick={() => handleDelete(patient.id)}
+                            >
+                                Deletar
+                            </Button>
+                        </tbody>
+                        ))}
+                    </table>
+                </TableContainer>
+            </Container>
+
+            <Container>
+                <TableContainer>
+                    <div id="title">
+                        <Title>
+                            <h1>Lista de pacientes</h1>
+                            <Button
+                                className="especialButton"
+                                type="button"
+                                onClick={() => handleIndex()}
+                            >
+                                Listar Pacientes
+                            </Button>
+                        </Title>
+                    </div>
+                    <table>
+                        <thead>
+                          <tr>
+                            <th>Nome</th>
+                            <th>DDD</th>
+                            <th>Telefone Preferencial</th>
+                            <th>DDD</th>
+                            <th>Telefone secundário</th>
+                          </tr>
+                        </thead>
+
+                        {patientsArray.map(patient => (
+                        <tbody
+                            key={patient.id}>
+                            <tr>
+                                <td>{patient.name}</td>
+                                <td>{patient.codeArea1}</td>
+                                <td>{patient.preferredPhone}</td>
+                                <td>{patient.codeArea2}</td>
+                                <td>{patient.secondaryPhone}</td>
+                            </tr>
+                            <Button
+                                className="blueButton"
+                                type="button"
+                                onClick={() => handleListPatients(patient.id)}
+                            >
+                                Agenda
+                            </Button>
+                            <Button
+                                className="greenButton"
+                                type="button"
+                                onClick={() => handleEdit(patient.id)}
+                            >
+                                Editar
+                            </Button>
+                            <Button
+                                className="redButton"
+                                type="button"
+                                onClick={() => handleDelete(patient.id)}
+                            >
+                                Deletar
+                            </Button>
+                        </tbody>
+                        ))}
+                    </table>
+                </TableContainer>
+            </Container>
+            
+            <Container>
+                <Form ref={formRef} onSubmit={handleAddPatient}>
+                    <Title><h1>Cadastre um novo paciente:</h1></Title>
+                    <div className="createContainer">
+                    <Input name="name" placeholder="Nome"/>
+                    <SmallInput name="codeArea1" placeholder="DDD" />
+                    <Input name="preferredPhone" placeholder="Telefone Preferencial" />
+                    <SmallInput name="codeArea2" placeholder="DDD" />
+                    <Input name="secondaryPhone" placeholder="Telefone Secundário" />
+                    <Button
+                        className="greenButton"
+                        type="submit"
+                    >
+                        Enviar
+                    </Button>
+                    </div>
+                    <img src={Logo} alt="Carefy Logo" />
+                </Form>
+            </Container>
+
+            <Footer />
+        </>
+    );
 };
 
 export default PatientPage;
