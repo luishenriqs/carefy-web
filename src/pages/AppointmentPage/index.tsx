@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import api from '../../services/api';
 import { Form } from '@unform/web';
 import Header from '../../components/Header';
@@ -31,8 +31,12 @@ interface IPatient {
 }
 
 interface ICreate {
-    name: string;
-    medicalSpecialty: string;
+    physician: string;
+    patient: string;
+    month: string;
+    day: string;
+    start: string;
+    end: string;
   }
 
 const AppointmentPage: React.FC = () => {
@@ -41,15 +45,15 @@ const AppointmentPage: React.FC = () => {
 
     const [foundedAppointments, setFoundedAppointments] = useState<Appointment[]>([]);
     
-    const [physicianArray, setPhysicianArray] = useState<Appointment[]>([]);
+    const [appointmentArray, setAppointmentArray] = useState<Appointment[]>([]);
 
 
-/* ************************[INDEX PHYSICIAN]********************************* */
+/* **********************[INDEX APPOINTMENTS]******************************** */
 async function handleIndex(): Promise<void> {
-    const response = await api.get(`/physicians/index`);
-    const physicians = response.data;
-    setPhysicianArray(physicians);
-  }
+    const response = await api.get(`/appointments/index`);
+    const appointments = response.data;
+    setAppointmentArray(appointments);
+}
 /* ************************************************************************** */
 
 /* *******************[SHOW APPOINTMENT BY PHYSICIAN]************************ */
@@ -57,49 +61,47 @@ async function handleShowAppointmentByPhysician({
     physician
 }: IPhysician): Promise<Appointment[]> {
 
-      const response = await api.get(`/appointments/showbyphysician`, {
+    const response = await api.get(`/appointments/showbyphysician`, {
         params: {
             physician,
         }
     });
     const appointments = response.data;
-
-    console.log('log do handle: ', appointments)
-
     setFoundedAppointments(appointments);
     return appointments;
-  }
+}
 /* ************************************************************************** */
 
-/* *******************[SHOW PHYSICIAN BY SPECIALTY]************************** */
+/* *******************[SHOW APPOINTMENT BY PATIENT]************************** */
 async function handleShowAppointmentByPatient({
     patient
 }: IPatient): Promise<Appointment[]> {
 
-    const response = await api.get(`/physicians/showbyspecialty`, {
-      params: {
-        patient,
-      }
-  });
-  const appointments = response.data;
-  setFoundedAppointments(appointments);
-  return appointments;
+    const response = await api.get(`/appointments/showbypatient`, {
+        params: {
+            patient,
+        }
+    });
+    const appointments = response.data;
+    setFoundedAppointments(appointments);
+    return appointments;
 }
 /* ************************************************************************** */
 
-/* *************************[CREATE PHYSICIAN]******************************* */
-async function handleAddPhysician(data: ICreate): Promise<Appointment> {
+/* ************************[CREATE APPOINTMENT]****************************** */
+async function handleAddAppointment(data: ICreate): Promise<Appointment> {
     
-    console.log('Array: ', data)
-    
-    const response = await api.post('/physicians', {
-        name: data.name,
-        medicalSpecialty: data.medicalSpecialty,   
+    const response = await api.post('/appointments', {
+        physician: data.physician,
+        patient: data.patient,
+        month: data.month,
+        day: data.day,
+        start: data.start,
+        end: data.end,
     });
-
-    const newPhysician = response.data;
-    return newPhysician;
-  }
+    const newAppointment = response.data;
+    return newAppointment;
+}
 /* ************************************************************************** */
 
 
@@ -227,7 +229,7 @@ async function handleAddPhysician(data: ICreate): Promise<Appointment> {
                             </tr>
                         </thead>
 
-                        {physicianArray.map(appointments => (
+                        {appointmentArray.map(appointments => (
                         <tbody
                             key={appointments.id}>
                             <tr>
@@ -266,7 +268,7 @@ async function handleAddPhysician(data: ICreate): Promise<Appointment> {
             </Container>
             
             <Container>
-                <Form ref={formRef} onSubmit={handleAddPhysician}>
+                <Form ref={formRef} onSubmit={handleAddAppointment}>
                     <Title><h1>Cadastre uma nova consulta:</h1></Title>
                     <div className="createContainer">
                     <Input name="physician" placeholder="Médico"/>

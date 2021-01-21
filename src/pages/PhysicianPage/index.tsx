@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import api from '../../services/api';
 import { Form } from '@unform/web';
 import Header from '../../components/Header';
@@ -34,8 +34,8 @@ const PhysicianPage: React.FC = () => {
     const formRef = useRef(null);
 
 
-    const [physicianArray, setPhysicianArray] = useState<Physician[]>([]);
     const [foundedPhysician, setFoundedPhysician] = useState<Physician[]>([]);
+    const [physicianArray, setPhysicianArray] = useState<Physician[]>([]);
 
 
 /* **[USE EFFECT - CARREGA OS DADOS DE FORMA AUTOMÁTICA JUNTO COM A PÁGINA]** */
@@ -54,7 +54,7 @@ async function handleIndex(): Promise<void> {
     const response = await api.get(`/physicians/index`);
     const physicians = response.data;
     setPhysicianArray(physicians);
-  }
+}
 /* ************************************************************************** */
 
 /* **********************[SHOW PHYSICIAN BY NAME]**************************** */
@@ -68,7 +68,7 @@ async function handleShowPhysicianByName({name}: IName): Promise<Physician[]> {
     const physician = response.data;
     setFoundedPhysician(physician);
     return physician;
-  }
+}
 /* ************************************************************************** */
 
 /* *******************[SHOW PHYSICIAN BY SPECIALTY]************************** */
@@ -77,20 +77,18 @@ async function handleShowPhysicianBySpecialty({
 }: ISpecialty): Promise<Physician[]> {
 
     const response = await api.get(`/physicians/showbyspecialty`, {
-      params: {
-          medicalSpecialty,
+        params: {
+            medicalSpecialty,
       }
-  });
-  const physician = response.data;
-  setFoundedPhysician(physician);
-  return physician;
+    });
+    const physician = response.data;
+    setFoundedPhysician(physician);
+    return physician;
 }
 /* ************************************************************************** */
 
 /* *************************[CREATE PHYSICIAN]******************************* */
 async function handleAddPhysician(data: ICreate): Promise<Physician> {
-    
-    console.log('Array: ', data)
     
     const response = await api.post('/physicians', {
         name: data.name,
@@ -99,7 +97,7 @@ async function handleAddPhysician(data: ICreate): Promise<Physician> {
 
     const newPhysician = response.data;
     return newPhysician;
-  }
+}
 /* ************************************************************************** */
 
 

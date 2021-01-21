@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import api from '../../services/api';
 import { Form } from '@unform/web';
 import Header from '../../components/Header';
@@ -37,22 +37,21 @@ const PatientPage: React.FC = () => {
     const formRef = useRef(null);
 
 
-    const [patientsArray, setPatientsArray] = useState<Patient[]>([]);
-
     const [foundedPatients, setFoundedPatients] = useState<Patient[]>([]);
+    const [patientsArray, setPatientsArray] = useState<Patient[]>([]);
 
 /* *************************[INDEX PATIENTS]********************************* */
 async function handleIndex(): Promise<void> {
     const response = await api.get(`/patients/index`);
     const patients = response.data;
     setPatientsArray(patients);
-  }
+}
 /* ************************************************************************** */
 
 /* ***********************[SHOW PATIENT BY NAME]***************************** */
 async function handleShowPatientByName({name}: IName): Promise<Patient[]> {
 
-      const response = await api.get(`/patients/showbyname`, {
+    const response = await api.get(`/patients/show`, {
         params: {
             name,
         }
@@ -60,7 +59,7 @@ async function handleShowPatientByName({name}: IName): Promise<Patient[]> {
     const patients = response.data;
     setFoundedPatients(patients);
     return patients;
-  }
+}
 /* ************************************************************************** */
 
 /* **************************[CREATE PATIENT]******************************** */
@@ -73,10 +72,9 @@ async function handleAddPatient(data: ICreate): Promise<Patient> {
         codeArea2: data.codeArea2,
         secondaryPhone: data.secondaryPhone,
     });
-
     const newPatient = response.data;
     return newPatient;
-  }
+}
 /* ************************************************************************** */
 
 
