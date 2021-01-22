@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useHistory } from 'react-router-dom';
 import api from '../../services/api';
 import { Form } from '@unform/web';
 import Header from '../../components/Header';
@@ -41,7 +42,7 @@ interface ICreate {
 
 const AppointmentPage: React.FC = () => {
     const formRef = useRef(null);
-
+    const history = useHistory();
 
     const [foundedAppointments, setFoundedAppointments] = useState<Appointment[]>([]);
     
@@ -104,18 +105,25 @@ async function handleAddAppointment(data: ICreate): Promise<Appointment> {
 }
 /* ************************************************************************** */
 
+/* ************************[EDIT PHYSICIAN]********************************** */
+async function handleEdit(
+    id: string | undefined): Promise<void> {
+    history.push(`/appointmentsedit/${id}`);
+}
+/* ************************************************************************** */
 
+/* ***********************[DELETE APPOINTMENTS]****************************** */
+async function handleDelete(id: string): Promise<void> {
 
-
-  async function handleEdit(id: string | undefined): Promise<void> {
-    const response = await api.patch(`/physicians/${id}`);
+    const response = await api.delete(`/appointments/delete`, {
+        params: {
+            id,
+        }
+    });
+    handleIndex();
     console.log(response);
-  }
-
-  async function handleDelete(id: string | undefined): Promise<void> {
-    const response = await api.delete(`/physicians/${id}`);
-    console.log(response);
-  }
+    }
+/* ************************************************************************** */
 
     return (
         <>

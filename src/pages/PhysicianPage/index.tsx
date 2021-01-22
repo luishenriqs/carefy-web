@@ -18,16 +18,6 @@ interface Physician {
   updated_at: Date;
 }
 
-interface Appointments {
-    id: string;
-    physician: string;
-    patient: string;
-    day: string;
-    month: string;
-    start: string;
-    end: string;
-}
-
 interface IName {
     name: string;
 }
@@ -46,7 +36,7 @@ const PhysicianPage: React.FC = () => {
     const history = useHistory();
 
 
-    const [foundedPhysician, setFoundedPhysician] = useState<Physician[]>([]);
+    const [foundPhysician, setFoundPhysician] = useState<Physician[]>([]);
     const [physicianArray, setPhysicianArray] = useState<Physician[]>([]);
 
 
@@ -55,7 +45,7 @@ async function handleIndex(): Promise<void> {
     const response = await api.get(`/physicians/index`);
     const physicians = response.data;
     setPhysicianArray(physicians);
-    setFoundedPhysician([]);
+    setFoundPhysician([]);
 }
 /* ************************************************************************** */
 
@@ -68,7 +58,7 @@ async function handleShowPhysicianByName({name}: IName): Promise<Physician[]> {
         }
     });
     const physician = response.data;
-    setFoundedPhysician(physician);
+    setFoundPhysician(physician);
     setPhysicianArray([]);
     return physician;
 }
@@ -85,7 +75,7 @@ async function handleShowPhysicianBySpecialty({
       }
     });
     const physician = response.data;
-    setFoundedPhysician(physician);
+    setFoundPhysician(physician);
     setPhysicianArray([]);
     return physician;
 }
@@ -112,18 +102,12 @@ async function handleListAppointmentsByPhysician(
 }
 /* ************************************************************************** */
 
-
-
-
-
-async function handleEdit(id: string | undefined): Promise<void> {
-const response = await api.patch(`/physicians/`);
-console.log(response);
+/* ************************[EDIT PHYSICIAN]********************************** */
+async function handleEdit(
+    name: string | undefined): Promise<void> {
+    history.push(`/physiciansedit/${name}`);
 }
-
-
-
-
+/* ************************************************************************** */
 
 /* *************************[DELETE PHYSICIAN]******************************* */
 async function handleDelete(id: string): Promise<void> {
@@ -179,7 +163,7 @@ console.log(response);
                                 <th>Especialidade Médica</th>
                             </tr>
                         </thead>
-                        {foundedPhysician.map(physician => (
+                        {foundPhysician.map(physician => (
                             <tbody
                             key={physician.id}>
                             <tr>
@@ -198,7 +182,7 @@ console.log(response);
                             <Button
                                 className="greenButton"
                                 type="button"
-                                onClick={() => handleEdit(physician.id)}
+                                onClick={() => handleEdit(physician.name)}
                             >
                                 Editar
                             </Button>
@@ -256,7 +240,7 @@ console.log(response);
                             <Button
                                 className="greenButton"
                                 type="button"
-                                onClick={() => handleEdit(physician.id)}
+                                onClick={() => handleEdit(physician.name)}
                             >
                                 Editar
                             </Button>

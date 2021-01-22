@@ -21,8 +21,11 @@ const ShowAppointmentPatient: React.FC = () => {
     
      
     const url = window.location;
-    var params = url.pathname.split('/')  
-    const name = params[2]
+    var params = url.pathname.split('/')
+    const replace1 = params[2].replace('%20',' ');
+    const replace2 = replace1.replace('%20',' ');
+    const replace3 = replace2.replace('%20',' ');
+    const name = replace3.replace('%20',' ');
 
     /* **********************[LIST APPOINTMENTS]***************************** */
     useEffect(() => {

@@ -39,7 +39,7 @@ const PatientPage: React.FC = () => {
     const history = useHistory();
 
 
-    const [foundedPatients, setFoundedPatients] = useState<Patient[]>([]);
+    const [foundPatients, setFoundPatients] = useState<Patient[]>([]);
     const [patientsArray, setPatientsArray] = useState<Patient[]>([]);
 
 /* *************************[INDEX PATIENTS]********************************* */
@@ -47,6 +47,7 @@ async function handleIndex(): Promise<void> {
     const response = await api.get(`/patients/index`);
     const patients = response.data;
     setPatientsArray(patients);
+    setFoundPatients([]);
 }
 /* ************************************************************************** */
 
@@ -59,7 +60,8 @@ async function handleShowPatientByName({name}: IName): Promise<Patient[]> {
         }
     });
     const patients = response.data;
-    setFoundedPatients(patients);
+    setFoundPatients(patients);
+    setPatientsArray([]);
     return patients;
 }
 /* ************************************************************************** */
@@ -75,6 +77,7 @@ async function handleAddPatient(data: ICreate): Promise<Patient> {
         secondaryPhone: data.secondaryPhone,
     });
     const newPatient = response.data;
+    handleIndex();
     return newPatient;
 }
 /* ************************************************************************** */
@@ -139,7 +142,7 @@ async function handleEdit(
                                 <th>Telefone secundário</th>
                             </tr>
                         </thead>
-                        {foundedPatients.map(patient => (
+                        {foundPatients.map(patient => (
                             <tbody
                             key={patient.id}>
                             <tr>

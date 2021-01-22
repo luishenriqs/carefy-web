@@ -4,34 +4,22 @@ import { useHistory } from 'react-router-dom';
 import api from '../../services/api';
 import { Form } from '@unform/web';
 import Input from '../../components/Input';
-import SmallInput from '../../components/SmallInput';
 import Button from '../../components/Button';
 import Logo from '../../assets/carefyLogo5.png';
 
 
 import { Container, FormContainer, TableContainer, Title } from './styles';
 
-interface Patients {
+interface Physician {
     name: string;
-    codeArea1: string;
-    preferredPhone: string;
-    codeArea2: string;
-    secondaryPhone: string;
+    medicalSpecialty: string;
 }
 
-interface ICreate {
-    name: string;
-    codeArea1: string;
-    preferredPhone: string;
-    codeArea2: string;
-    secondaryPhone: string;
-}
-
-const EditPatient: React.FC = () => {
+const EditPhysician: React.FC = () => {
     const formRef = useRef(null);
     const history = useHistory();
 
-    const [patient, setPatient] = useState<Patients[]>([]);
+    const [physician, setPhysician] = useState<Physician[]>([]);
 
     const url = window.location;
     var params = url.pathname.split('/');
@@ -40,40 +28,37 @@ const EditPatient: React.FC = () => {
     const replace3 = replace2.replace('%20',' ');
     const name = replace3.replace('%20',' ');
 
-/* *************************[LOADING PATIENT]******************************** */
+/* ***********************[LOADING PHYSICIAN]******************************** */
 useEffect(() => {
-    const loadPatient = async (): Promise<Patients[]> => {
-        const response = await api.get(`/patients/show`, {
+    const loadPhysician = async (): Promise<Physician[]> => {
+        const response = await api.get(`/physicians/showbyname`, {
             params: {
                 name,
             }
         });
-        const patients = response.data;
-        setPatient(patients);
-        return patients;
+        const physician = response.data;
+        setPhysician(physician);
+        return physician;
     }
-    loadPatient();
+    loadPhysician();
   }, [name]);
 /* ************************************************************************** */
 
-/* **************************[EDIT PATIENT]********************************** */
-async function handleEdit(data: ICreate | undefined): Promise<void> {
+/* ************************[EDIT PHYSICIAN]********************************** */
+async function handleEdit(data: Physician | undefined): Promise<void> {
 
     const oldName = name;
     
     if (!data) {throw new Error('Error.')};
 
-    const response = await api.patch('/patients/edit', {
+    const response = await api.patch('/physicians/edit', {
         oldName,
         name: data.name,
-        codeArea1: data.codeArea1,
-        preferredPhone: data.preferredPhone,
-        codeArea2: data.codeArea2,
-        secondaryPhone: data.secondaryPhone,
+        medicalSpecialty: data.medicalSpecialty,
     });
-    const newPatient = response.data;
-    history.push(`/patients`);
-    return newPatient;
+    const newPhysician = response.data;
+    history.push(`/physicians`);
+    return newPhysician;
 }
 /* ************************************************************************** */
 
@@ -95,21 +80,15 @@ async function handleEdit(data: ICreate | undefined): Promise<void> {
                     <thead>
                         <tr>
                             <th>Nome</th>
-                            <th>DDD</th>
-                            <th>Telefone Preferencial</th>
-                            <th>DDD</th>
-                            <th>Telefone secundário</th>
+                            <th>Especialidade</th>
                         </tr>
                     </thead>
                     <tbody
-                        key={patient[0]?.name}>
+                        key={physician[0]?.name}>
                         <tr>
-                            <td>{patient[0]?.name}</td>
-                            <td>{patient[0]?.codeArea1}</td>
-                            <td>{patient[0]?.preferredPhone}</td>
-                            <td>{patient[0]?.codeArea2}</td>
-                            <td>{patient[0]?.secondaryPhone}</td>
-                        </tr>
+                            <td>{physician[0]?.name}</td>
+                            <td>{physician[0]?.medicalSpecialty}</td>
+                          </tr>
                     </tbody>
                 </table>
             </TableContainer>
@@ -118,10 +97,7 @@ async function handleEdit(data: ICreate | undefined): Promise<void> {
                     <Title><h2>Edite esses dados:</h2></Title>
                     <div className="createContainer">
                     <Input name="name" placeholder="Nome"/>
-                    <SmallInput name="codeArea1" placeholder="DDD" />
-                    <Input name="preferredPhone" placeholder="Telefone Preferencial" />
-                    <SmallInput name="codeArea2" placeholder="DDD" />
-                    <Input name="secondaryPhone" placeholder="Telefone Secundário" />
+                    <Input name="medicalSpecialty" placeholder="Especialidade" />
                     <Button
                         className="greenButton"
                         type="submit"
@@ -140,4 +116,4 @@ async function handleEdit(data: ICreate | undefined): Promise<void> {
     );
 };
 
-export default EditPatient;
+export default EditPhysician;

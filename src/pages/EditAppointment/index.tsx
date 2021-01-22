@@ -11,68 +11,58 @@ import Logo from '../../assets/carefyLogo5.png';
 
 import { Container, FormContainer, TableContainer, Title } from './styles';
 
-interface Patients {
-    name: string;
-    codeArea1: string;
-    preferredPhone: string;
-    codeArea2: string;
-    secondaryPhone: string;
+interface Appointment {
+    physician: string;
+    patient: string;
+    day: string;
+    month: string;
+    start: string;
+    end: string;
 }
 
-interface ICreate {
-    name: string;
-    codeArea1: string;
-    preferredPhone: string;
-    codeArea2: string;
-    secondaryPhone: string;
-}
-
-const EditPatient: React.FC = () => {
+const EditAppointment: React.FC = () => {
     const formRef = useRef(null);
     const history = useHistory();
 
-    const [patient, setPatient] = useState<Patients[]>([]);
+    const [appointment, setAppointment] = useState<Appointment[]>([]);
 
     const url = window.location;
     var params = url.pathname.split('/');
-    const replace1 = params[2].replace('%20',' ');
-    const replace2 = replace1.replace('%20',' ');
-    const replace3 = replace2.replace('%20',' ');
-    const name = replace3.replace('%20',' ');
+    const id = params[2].replace('%20',' ');
 
-/* *************************[LOADING PATIENT]******************************** */
+
+/* *************************[LOADING APPOINTMENT]******************************** */
 useEffect(() => {
-    const loadPatient = async (): Promise<Patients[]> => {
-        const response = await api.get(`/patients/show`, {
+    const loadAppointment = async (): Promise<Appointment[]> => {
+        const response = await api.get(`/appointments/showbyid`, {
             params: {
-                name,
+                id,
             }
         });
-        const patients = response.data;
-        setPatient(patients);
-        return patients;
+        const appointments = response.data;
+        setAppointment(appointments);
+        return appointments;
     }
-    loadPatient();
-  }, [name]);
+    loadAppointment();
+  }, [id]);
 /* ************************************************************************** */
 
 /* **************************[EDIT PATIENT]********************************** */
-async function handleEdit(data: ICreate | undefined): Promise<void> {
-
-    const oldName = name;
-    
+async function handleEdit(data: Appointment | undefined): Promise<void> {
+  
     if (!data) {throw new Error('Error.')};
 
     const response = await api.patch('/patients/edit', {
-        oldName,
-        name: data.name,
-        codeArea1: data.codeArea1,
-        preferredPhone: data.preferredPhone,
-        codeArea2: data.codeArea2,
-        secondaryPhone: data.secondaryPhone,
+        id,
+        physician: data.physician,
+        patient: data.patient,
+        day: data.day,
+        month: data.month,
+        start: data.start,
+        end: data.end,
     });
     const newPatient = response.data;
-    history.push(`/patients`);
+    history.push(`/appointments`);
     return newPatient;
 }
 /* ************************************************************************** */
@@ -90,25 +80,27 @@ async function handleEdit(data: ICreate | undefined): Promise<void> {
                 </header>
             </Container> 
             <TableContainer>
-                <Title><h1>Estes são os dados atuais de {name}:</h1></Title>
+                <Title><h1>Estes são os dados atuais desta consulta:</h1></Title>
                 <table>
                     <thead>
                         <tr>
-                            <th>Nome</th>
-                            <th>DDD</th>
-                            <th>Telefone Preferencial</th>
-                            <th>DDD</th>
-                            <th>Telefone secundário</th>
+                            <th>Médico</th>
+                            <th>Paciente</th>
+                            <th>Dia</th>
+                            <th>Mês</th>
+                            <th>Início</th>
+                            <th>Fim</th>
                         </tr>
                     </thead>
                     <tbody
-                        key={patient[0]?.name}>
+                        key={appointment[0]?.physician}>
                         <tr>
-                            <td>{patient[0]?.name}</td>
-                            <td>{patient[0]?.codeArea1}</td>
-                            <td>{patient[0]?.preferredPhone}</td>
-                            <td>{patient[0]?.codeArea2}</td>
-                            <td>{patient[0]?.secondaryPhone}</td>
+                            <td>{appointment[0]?.physician}</td>
+                            <td>{appointment[0]?.patient}</td>
+                            <td>{appointment[0]?.day}</td>
+                            <td>{appointment[0]?.month}</td>
+                            <td>{appointment[0]?.start}</td>
+                            <td>{appointment[0]?.end}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -117,11 +109,12 @@ async function handleEdit(data: ICreate | undefined): Promise<void> {
                 <Form ref={formRef} onSubmit={handleEdit}>
                     <Title><h2>Edite esses dados:</h2></Title>
                     <div className="createContainer">
-                    <Input name="name" placeholder="Nome"/>
-                    <SmallInput name="codeArea1" placeholder="DDD" />
-                    <Input name="preferredPhone" placeholder="Telefone Preferencial" />
-                    <SmallInput name="codeArea2" placeholder="DDD" />
-                    <Input name="secondaryPhone" placeholder="Telefone Secundário" />
+                    <Input name="physician" placeholder="Médico"/>
+                    <Input name="patient" placeholder="Paciente" />
+                    <SmallInput name="day" placeholder="Dia" />
+                    <SmallInput name="month" placeholder="Mês" />
+                    <SmallInput name="start" placeholder="Início" />
+                    <SmallInput name="end" placeholder="Fim" />
                     <Button
                         className="greenButton"
                         type="submit"
@@ -140,4 +133,4 @@ async function handleEdit(data: ICreate | undefined): Promise<void> {
     );
 };
 
-export default EditPatient;
+export default EditAppointment;
