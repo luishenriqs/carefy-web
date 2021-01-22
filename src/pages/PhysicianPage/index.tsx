@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useHistory } from 'react-router-dom';
 import api from '../../services/api';
 import { Form } from '@unform/web';
 import Header from '../../components/Header';
@@ -17,6 +18,16 @@ interface Physician {
   updated_at: Date;
 }
 
+interface Appointments {
+    id: string;
+    physician: string;
+    patient: string;
+    day: string;
+    month: string;
+    start: string;
+    end: string;
+}
+
 interface IName {
     name: string;
 }
@@ -32,28 +43,19 @@ interface ICreate {
 
 const PhysicianPage: React.FC = () => {
     const formRef = useRef(null);
+    const history = useHistory();
 
 
     const [foundedPhysician, setFoundedPhysician] = useState<Physician[]>([]);
     const [physicianArray, setPhysicianArray] = useState<Physician[]>([]);
 
 
-/* **[USE EFFECT - CARREGA OS DADOS DE FORMA AUTOMÁTICA JUNTO COM A PÁGINA]** */
-//   useEffect(() => {
-//     async function loadPhysician(): Promise<void> {
-//       const response = await api.get('/physicians/index');
-//       const physicians = response.data;
-//       setPhysicianArray(physicians);
-//     }
-//     loadPhysician();
-//   }, [physicianArray]);
-/* ************************************************************************** */
-
 /* ************************[INDEX PHYSICIAN]********************************* */
 async function handleIndex(): Promise<void> {
     const response = await api.get(`/physicians/index`);
     const physicians = response.data;
     setPhysicianArray(physicians);
+    setFoundedPhysician([]);
 }
 /* ************************************************************************** */
 
@@ -67,6 +69,7 @@ async function handleShowPhysicianByName({name}: IName): Promise<Physician[]> {
     });
     const physician = response.data;
     setFoundedPhysician(physician);
+    setPhysicianArray([]);
     return physician;
 }
 /* ************************************************************************** */
@@ -83,6 +86,7 @@ async function handleShowPhysicianBySpecialty({
     });
     const physician = response.data;
     setFoundedPhysician(physician);
+    setPhysicianArray([]);
     return physician;
 }
 /* ************************************************************************** */
@@ -96,25 +100,43 @@ async function handleAddPhysician(data: ICreate): Promise<Physician> {
     });
 
     const newPhysician = response.data;
+    handleIndex();
     return newPhysician;
 }
 /* ************************************************************************** */
 
+/* ************************[LIST APPOINTMENTS]******************************* */
+async function handleListAppointmentsByPhysician(
+    name: string | undefined): Promise<void> {
+    history.push(`/showappointmentsphysicians/${name}`);
+}
+/* ************************************************************************** */
 
-  async function handleListAppointments(id: string | undefined): Promise<void> {
-    const response = await api.get(`/physicians/${id}`);
-    console.log(response);
-  }
 
-  async function handleEdit(id: string | undefined): Promise<void> {
-    const response = await api.patch(`/physicians/${id}`);
-    console.log(response);
-  }
 
-  async function handleDelete(id: string | undefined): Promise<void> {
-    const response = await api.delete(`/physicians/${id}`);
-    console.log(response);
-  }
+
+
+async function handleEdit(id: string | undefined): Promise<void> {
+const response = await api.patch(`/physicians/`);
+console.log(response);
+}
+
+
+
+
+
+/* *************************[DELETE PHYSICIAN]******************************* */
+async function handleDelete(id: string): Promise<void> {
+
+const response = await api.delete(`/physicians/delete`, {
+    params: {
+        id,
+    }
+});
+handleIndex();
+console.log(response);
+}
+/* ************************************************************************** */
 
     return (
         <>
@@ -167,7 +189,9 @@ async function handleAddPhysician(data: ICreate): Promise<Physician> {
                             <Button
                                 className="blueButton"
                                 type="button"
-                                onClick={() => handleListAppointments(physician.id)}
+                                onClick={() => handleListAppointmentsByPhysician(
+                                    physician.name
+                                )}
                             >
                                 Agenda
                             </Button>
@@ -223,7 +247,9 @@ async function handleAddPhysician(data: ICreate): Promise<Physician> {
                             <Button
                                 className="blueButton"
                                 type="button"
-                                onClick={() => handleListAppointments(physician.id)}
+                                onClick={() => handleListAppointmentsByPhysician(
+                                    physician.name
+                                )}
                             >
                                 Agenda
                             </Button>

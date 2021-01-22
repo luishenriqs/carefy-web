@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useHistory } from 'react-router-dom';
 import api from '../../services/api';
 import { Form } from '@unform/web';
 import Header from '../../components/Header';
@@ -31,10 +32,11 @@ interface ICreate {
     preferredPhone: string;
     codeArea2: string;
     secondaryPhone: string;
-  }
+}
 
 const PatientPage: React.FC = () => {
     const formRef = useRef(null);
+    const history = useHistory();
 
 
     const [foundedPatients, setFoundedPatients] = useState<Patient[]>([]);
@@ -77,21 +79,33 @@ async function handleAddPatient(data: ICreate): Promise<Patient> {
 }
 /* ************************************************************************** */
 
+/* ************************[LIST APPOINTMENTS]******************************* */
+async function handleListAppointmentsByPatient(
+    name: string | undefined): Promise<void> {
+    history.push(`/showappointmentspatients/${name}`);
+}
+/* ************************************************************************** */
 
-  async function handleListPatients(id: string | undefined): Promise<void> {
-    const response = await api.get(`/physicians/${id}`);
+
+/* **************************[EDIT PATIENT]********************************** */
+async function handleEdit(
+    name: string | undefined): Promise<void> {
+    history.push(`/patientsedit/${name}`);
+}
+/* ************************************************************************** */
+
+
+/* **************************[DELETE PATIENT]******************************** */
+  async function handleDelete(id: string): Promise<void> {
+    const response = await api.delete(`/patients/delete`, {
+        params: {
+            id,
+        }
+    });
+    handleIndex();
     console.log(response);
   }
-
-  async function handleEdit(id: string | undefined): Promise<void> {
-    const response = await api.patch(`/physicians/${id}`);
-    console.log(response);
-  }
-
-  async function handleDelete(id: string | undefined): Promise<void> {
-    const response = await api.delete(`/physicians/${id}`);
-    console.log(response);
-  }
+/* ************************************************************************** */
 
     return (
         <>
@@ -138,14 +152,16 @@ async function handleAddPatient(data: ICreate): Promise<Patient> {
                             <Button
                                 className="blueButton"
                                 type="button"
-                                onClick={() => handleListPatients(patient.id)}
+                                onClick={() => handleListAppointmentsByPatient(
+                                    patient.name
+                                )}
                             >
                                 Agenda
                             </Button>
                             <Button
                                 className="greenButton"
                                 type="button"
-                                onClick={() => handleEdit(patient.id)}
+                                onClick={() => handleEdit(patient.name)}
                             >
                                 Editar
                             </Button>
@@ -200,14 +216,16 @@ async function handleAddPatient(data: ICreate): Promise<Patient> {
                             <Button
                                 className="blueButton"
                                 type="button"
-                                onClick={() => handleListPatients(patient.id)}
+                                onClick={() => handleListAppointmentsByPatient(
+                                    patient.name
+                                )}
                             >
                                 Agenda
                             </Button>
                             <Button
                                 className="greenButton"
                                 type="button"
-                                onClick={() => handleEdit(patient.id)}
+                                onClick={() => handleEdit(patient.name)}
                             >
                                 Editar
                             </Button>

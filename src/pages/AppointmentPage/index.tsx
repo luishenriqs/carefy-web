@@ -105,10 +105,7 @@ async function handleAddAppointment(data: ICreate): Promise<Appointment> {
 /* ************************************************************************** */
 
 
-  async function handleListAppointments(id: string | undefined): Promise<void> {
-    const response = await api.get(`/physicians/${id}`);
-    console.log(response);
-  }
+
 
   async function handleEdit(id: string | undefined): Promise<void> {
     const response = await api.patch(`/physicians/${id}`);
@@ -177,13 +174,6 @@ async function handleAddAppointment(data: ICreate): Promise<Appointment> {
                                 <td>{appointment.end}</td>
                             </tr>
                             <Button
-                                className="blueButton"
-                                type="button"
-                                onClick={() => handleListAppointments(appointment.id)}
-                            >
-                                Agenda
-                            </Button>
-                            <Button
                                 className="greenButton"
                                 type="button"
                                 onClick={() => handleEdit(appointment.id)}
@@ -240,13 +230,6 @@ async function handleAddAppointment(data: ICreate): Promise<Appointment> {
                                 <td>{appointments.start}</td>
                                 <td>{appointments.end}</td>
                             </tr>
-                            <Button
-                                className="blueButton"
-                                type="button"
-                                onClick={() => handleListAppointments(appointments.id)}
-                            >
-                                Agenda
-                            </Button>
                             <Button
                                 className="greenButton"
                                 type="button"
